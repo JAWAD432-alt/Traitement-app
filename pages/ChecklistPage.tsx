@@ -32,6 +32,7 @@ export function ChecklistPage({ onNavigate }: ChecklistPageProps): React.ReactNo
             console.log("Seeding checklist items...");
             const itemsToInsert = CHECKLIST_DATA.map(item => ({
                 ...item,
+                conformite: String(item.conformite),
                 note: String(item.note),
                 score: String(item.score),
             }));

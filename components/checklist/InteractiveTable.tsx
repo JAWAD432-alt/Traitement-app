@@ -26,6 +26,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
   const [newItem, setNewItem] = useState<Omit<ChecklistItem, 'id' | 'created_at' | 'category'>>({
       volet: '',
       critere: '',
+      conformite: '',
       note: '',
       score: '',
       constats: '',
@@ -75,7 +76,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
   const handleShowAddForm = () => {
     setNewItem({
         volet: '', critere: '', note: '', score: '', constats: '',
-        action: '', resp: '', datePrevue: '', etat: '', original_id: null,
+        action: '', resp: '', datePrevue: '', etat: '', original_id: null, conformite: ''
     });
     setFormError(null);
     setIsAdding(true);
@@ -152,9 +153,9 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
   };
 
   const handleExportToCSV = () => {
-    const headers = ['N°', 'Catégorie', 'Volet', 'Critère', 'Note', 'Score', 'Constats', 'Action', 'Responsable', 'Date Prévue', 'État'];
+    const headers = ['N°', 'Catégorie', 'Volet', 'Critère', 'Conformité', 'Note', 'Score', 'Constats', 'Action', 'Responsable', 'Date Prévue', 'État'];
     const rows = data.map((row, index) =>
-      [index + 1, row.category, row.volet, `"${(row.critere || '').replace(/"/g, '""')}"`, row.note, row.score, `"${(row.constats || '').replace(/"/g, '""')}"`, `"${(row.action || '').replace(/"/g, '""')}"`, row.resp, row.datePrevue, row.etat].join(',')
+      [index + 1, row.category, row.volet, `"${(row.critere || '').replace(/"/g, '""')}"`, row.conformite, row.note, row.score, `"${(row.constats || '').replace(/"/g, '""')}"`, `"${(row.action || '').replace(/"/g, '""')}"`, row.resp, row.datePrevue, row.etat].join(',')
     );
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows].join('\n');
     const encodedUri = encodeURI(csvContent);
@@ -178,7 +179,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
     const isEditing = editingCell?.id === row.id && editingCell?.key === key;
     const cellKey = `${row.id}-${String(key)}`;
     const status = cellSaveStatus[cellKey];
-    const isNumeric = key === 'note' || key === 'score';
+    const isNumeric = key === 'note' || key === 'score' || key === 'conformite';
     const nonEditableKeys: (keyof ChecklistItem)[] = ['id', 'created_at', 'category', 'original_id'];
     
     if (nonEditableKeys.includes(key)) {
@@ -278,14 +279,18 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
                 <span>{formError}</span>
              </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="md:col-span-1">
                 <label htmlFor="volet" className="block text-sm font-medium text-slate-600 mb-1">Volet</label>
                 <input type="text" name="volet" id="volet" value={newItem.volet || ''} onChange={handleFormInputChange} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
             </div>
-            <div className="md:col-span-2">
+            <div className="md:col-span-3">
                 <label htmlFor="critere" className="block text-sm font-medium text-slate-600 mb-1">Critères *</label>
                 <textarea name="critere" id="critere" value={newItem.critere || ''} onChange={handleFormInputChange} rows={1} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
+            </div>
+            <div>
+                <label htmlFor="conformite" className="block text-sm font-medium text-slate-600 mb-1">Conformité</label>
+                <input type="text" name="conformite" id="conformite" value={newItem.conformite || ''} onChange={handleFormInputChange} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
             </div>
             <div>
                 <label htmlFor="note" className="block text-sm font-medium text-slate-600 mb-1">Note</label>
@@ -299,11 +304,11 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
                 <label htmlFor="etat" className="block text-sm font-medium text-slate-600 mb-1">État</label>
                 <input type="text" name="etat" id="etat" value={newItem.etat || ''} onChange={handleFormInputChange} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
             </div>
-            <div className="md:col-span-3">
+            <div className="md:col-span-4">
                 <label htmlFor="constats" className="block text-sm font-medium text-slate-600 mb-1">Constats</label>
                 <textarea name="constats" id="constats" value={newItem.constats || ''} onChange={handleFormInputChange} rows={2} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
             </div>
-            <div className="md:col-span-3">
+            <div className="md:col-span-4">
                 <label htmlFor="action" className="block text-sm font-medium text-slate-600 mb-1">Action</label>
                 <textarea name="action" id="action" value={newItem.action || ''} onChange={handleFormInputChange} rows={2} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></textarea>
             </div>
@@ -311,7 +316,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
                 <label htmlFor="resp" className="block text-sm font-medium text-slate-600 mb-1">Responsable</label>
                 <input type="text" name="resp" id="resp" value={newItem.resp || ''} onChange={handleFormInputChange} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
             </div>
-            <div>
+            <div className="md:col-span-2">
                 <label htmlFor="datePrevue" className="block text-sm font-medium text-slate-600 mb-1">Date Prévue</label>
                 <input type="date" name="datePrevue" id="datePrevue" value={newItem.datePrevue || ''} onChange={handleFormInputChange} className="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"/>
             </div>
@@ -332,6 +337,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
               <th className="p-2 border text-center font-semibold w-[50px]">N°</th>
               <th className="p-2 border text-left font-semibold">Volet</th>
               <th className="p-2 border text-left font-semibold w-1/4">Critères</th>
+              <th className="p-2 border text-center font-semibold w-[80px]">Conformité</th>
               <th className="p-2 border text-center font-semibold w-[60px]">Note</th>
               <th className="p-2 border text-center font-semibold w-[60px]">Score</th>
               <th className="p-2 border text-left font-semibold">Constats</th>
@@ -348,6 +354,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
                 <td className="p-2 border align-top text-center">{index + 1}</td>
                 <td className="p-2 border align-top">{renderCell(row, 'volet')}</td>
                 <td className="p-2 border align-top">{renderCell(row, 'critere')}</td>
+                <td className="p-2 border text-center align-top">{renderCell(row, 'conformite')}</td>
                 <td className="p-2 border text-center align-top">{renderCell(row, 'note')}</td>
                 <td className="p-2 border text-center align-top">{renderCell(row, 'score')}</td>
                 <td className="p-2 border align-top">{renderCell(row, 'constats')}</td>
@@ -366,7 +373,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
           <tfoot>
             {data.length === 0 && !isAdding && (
               <tr>
-                <td colSpan={11} className="text-center p-8 text-slate-500 border">
+                <td colSpan={12} className="text-center p-8 text-slate-500 border">
                     <p className="font-semibold">Aucun critère pour cette catégorie.</p>
                     <p className="text-sm mt-1">Cliquez sur le bouton "+ Créer" pour en ajouter un.</p>
                 </td>

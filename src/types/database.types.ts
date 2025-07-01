@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           action: string | null
           category: string
+          conformite: string | null
           constats: string | null
           created_at: string
           critere: string | null
@@ -28,6 +29,7 @@ export type Database = {
         Insert: {
           action?: string | null
           category: string
+          conformite?: string | null
           constats?: string | null
           created_at?: string
           critere?: string | null
@@ -43,6 +45,7 @@ export type Database = {
         Update: {
           action?: string | null
           category?: string
+          conformite?: string | null
           constats?: string | null
           created_at?: string
           critere?: string | null
