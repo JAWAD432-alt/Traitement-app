@@ -1,0 +1,6 @@
+{
+  "name": "Système de Suivi d'Audit",
+  "description": "Une application complète pour la gestion d'audits. Inclut un suivi du scénario de déroulement et une checklist de conformité interactive (SDA FSS) avec des fonctionnalités d'édition, d'export et de suivi.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
