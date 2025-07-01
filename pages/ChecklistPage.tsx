@@ -30,12 +30,10 @@ export function ChecklistPage({ onNavigate }: ChecklistPageProps): React.ReactNo
         const { count } = await supabase.from('checklist_items').select('*', { count: 'exact', head: true });
         if(count === 0) {
             console.log("Seeding checklist items...");
-            const itemsToInsert = CHECKLIST_DATA.map(item => ({
-                ...item,
-                conformite: String(item.conformite),
-                note: String(item.note),
-                score: String(item.score),
-            }));
+            const itemsToInsert = CHECKLIST_DATA.map(item => {
+                const { id, ...rest } = item;
+                return { ...rest, original_id: id };
+            });
             const { error: insertError } = await supabase.from('checklist_items').insert(itemsToInsert);
             if(insertError) {
                 console.error("Erreur lors de l'insertion des items de checklist:", insertError);
