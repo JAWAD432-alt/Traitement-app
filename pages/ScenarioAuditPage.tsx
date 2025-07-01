@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Page } from '../App';
 import { isSupabaseConnected, supabase } from '../src/supabaseClient';
-import { AuditStep, ScenarioAction } from '../types';
+import { AuditStep, ScenarioAction, InitialAuditStep } from '../types';
 import { ArrowLeftIcon } from '../components/Icons';
 import { ScenarioTabs } from '../components/scenario/ScenarioTabs';
 import { ScenarioTable } from '../components/scenario/ScenarioTable';
@@ -19,7 +19,7 @@ export function ScenarioAuditPage({ onNavigate }: ScenarioAuditPageProps): React
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<Error | null>(null);
   const [activeStepId, setActiveStepId] = useState<number>(1);
-  const [localStepsData, setLocalStepsData] = useState<AuditStep[]>(AUDIT_STEPS_DATA);
+  const [localStepsData, setLocalStepsData] = useState<InitialAuditStep[]>(AUDIT_STEPS_DATA);
   const [activeStepActions, setActiveStepActions] = useState<ScenarioAction[]>([]);
   
   const fetchScenarios = useCallback(async () => {

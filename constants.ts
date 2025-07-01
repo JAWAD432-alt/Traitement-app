@@ -1,9 +1,9 @@
 
-import { AuditStep } from './types';
+import { InitialAuditStep } from './types';
 
 const EMPTY_ACTION_FIELDS = { statut: '', resp: '', datePrevue: '', commentaires: '' };
 
-export const AUDIT_STEPS_DATA: AuditStep[] = [
+export const AUDIT_STEPS_DATA: InitialAuditStep[] = [
   {
     id: 1,
     title: "Arrivée et Réunion d'Ouverture",

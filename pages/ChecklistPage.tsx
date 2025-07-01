@@ -22,6 +22,7 @@ export function ChecklistPage({ onNavigate }: ChecklistPageProps): React.ReactNo
   const [fetchError, setFetchError] = useState<Error | null>(null);
 
   const fetchChecklistData = useCallback(async () => {
+    setChecklistState([]); // Vider les données pour éviter d'utiliser des données périmées
     setLoading(true);
     setFetchError(null);
 
