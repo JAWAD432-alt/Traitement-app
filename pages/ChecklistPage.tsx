@@ -26,15 +26,37 @@ export function ChecklistPage({ onNavigate }: ChecklistPageProps): React.ReactNo
     setFetchError(null);
 
     if (isSupabaseConnected) {
-        // Check for seeding only once
-        const { count } = await supabase.from('checklist_items').select('*', { count: 'exact', head: true });
-        if(count === 0) {
+        // More robust check to see if we need to seed data
+        const { data: checkData, error: checkError } = await supabase.from('checklist_items').select('id').limit(1);
+
+        if (checkError) {
+          console.error("Erreur lors de la vérification des données:", checkError);
+          // If RLS is not enabled, this check will fail. We should show the error.
+          setFetchError(checkError);
+          setLoading(false);
+          return;
+        }
+
+        if (checkData.length === 0) {
             console.log("Seeding checklist items...");
-            const itemsToInsert = CHECKLIST_DATA.map(item => {
-                const { id, ...rest } = item;
-                return { ...rest, original_id: id };
-            });
+             // Manually construct objects to ensure `id` is not included in the payload.
+            const itemsToInsert = CHECKLIST_DATA.map(item => ({
+                original_id: item.id,
+                category: item.category,
+                volet: item.volet,
+                critere: item.critere,
+                conformite: item.conformite,
+                note: item.note,
+                score: item.score,
+                constats: item.constats,
+                action: item.action,
+                resp: item.resp,
+                datePrevue: item.datePrevue,
+                etat: item.etat
+            }));
+
             const { error: insertError } = await supabase.from('checklist_items').insert(itemsToInsert);
+            
             if(insertError) {
                 console.error("Erreur lors de l'insertion des items de checklist:", insertError);
                 setFetchError(insertError);
@@ -43,6 +65,7 @@ export function ChecklistPage({ onNavigate }: ChecklistPageProps): React.ReactNo
             }
         }
         
+        // Refetch data for the active tab after potential seeding
         const { data, error } = await supabase
           .from('checklist_items')
           .select('*')
