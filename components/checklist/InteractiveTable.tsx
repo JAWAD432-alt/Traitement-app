@@ -21,7 +21,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
   const [isAdding, setIsAdding] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
-  const [alert, setAlert] = useState<{ type: 'error' | 'success', message: string } | null>(null);
+  const [notification, setNotification] = useState<{ type: 'error' | 'success', message: string } | null>(null);
 
   const [newItem, setNewItem] = useState<Omit<ChecklistItem, 'id' | 'created_at' | 'category'>>({
       volet: '',
@@ -98,7 +98,7 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
     }
     setFormError(null);
     setIsSubmitting(true);
-    setAlert(null);
+    setNotification(null);
     
     if (isSupabaseConnected) {
         const newRow: ChecklistItemInsert = { ...newItem, category: category };
@@ -106,15 +106,15 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
         if (error) {
             console.error("Erreur d'ajout:", error);
             setFormError(`Une erreur est survenue: ${error.message}`);
-            setAlert({
+            setNotification({
                 type: 'error',
                 message: `Erreur de création : ${error.message}. Vérifiez que la sécurité (RLS) est bien ACTIVÉE sur la table et que votre règle autorise l'opération 'INSERT'.`
             });
         } else {
             refetchData();
             setIsAdding(false);
-            setAlert({ type: 'success', message: 'Élément créé avec succès !' });
-            setTimeout(() => setAlert(null), 5000);
+            setNotification({ type: 'success', message: 'Élément créé avec succès !' });
+            setTimeout(() => setNotification(null), 5000);
         }
     } else {
         const newRow: ChecklistItem = {
@@ -131,19 +131,19 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
 
   const handleDeleteRow = async (id: string) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette ligne ?')) {
-      setAlert(null);
+      setNotification(null);
       if (isSupabaseConnected) {
         const { error } = await supabase.from('checklist_items').delete().eq('id', id);
          if(error) {
           console.error("Erreur de suppression:", error);
-          setAlert({
+          setNotification({
               type: 'error',
               message: `Erreur de suppression : ${error.message}. Vérifiez que la sécurité (RLS) est bien ACTIVÉE sur la table et que votre règle autorise l'opération 'DELETE'.`
           });
         } else {
           refetchData();
-          setAlert({ type: 'success', message: 'Ligne supprimée avec succès !' });
-          setTimeout(() => setAlert(null), 5000);
+          setNotification({ type: 'success', message: 'Ligne supprimée avec succès !' });
+          setTimeout(() => setNotification(null), 5000);
         }
       } else {
         setData(data.filter(row => row.id !== id));
@@ -225,15 +225,15 @@ export function InteractiveTable({ data, setData, category, refetchData }: Inter
         onChange={handleImportFromCSV}
         className="hidden"
       />
-      {alert && (
-        <div className={`flex items-start gap-3 p-4 mb-4 rounded-lg border animate-fade-in ${alert.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800'}`}>
+      {notification && (
+        <div className={`flex items-start gap-3 p-4 mb-4 rounded-lg border animate-fade-in ${notification.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' : 'bg-green-50 border-green-200 text-green-800'}`}>
             <div className="flex-shrink-0">
-                {alert.type === 'error' ? <ExclamationTriangleIcon className="w-5 h-5"/> : <CheckIcon className="w-5 h-5"/>}
+                {notification.type === 'error' ? <ExclamationTriangleIcon className="w-5 h-5"/> : <CheckIcon className="w-5 h-5"/>}
             </div>
             <div className="flex-1 text-sm font-medium">
-                {alert.message}
+                {notification.message}
             </div>
-            <button onClick={() => setAlert(null)} className="flex-shrink-0 -mt-1 -mr-1 p-1 rounded-full hover:bg-black/10">
+            <button onClick={() => setNotification(null)} className="flex-shrink-0 -mt-1 -mr-1 p-1 rounded-full hover:bg-black/10">
                 <XIcon className="w-5 h-5"/>
             </button>
         </div>
